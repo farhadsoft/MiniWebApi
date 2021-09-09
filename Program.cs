@@ -1,33 +1,31 @@
-using Microsoft.AspNetCore.Mvc;
-
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<ProductRepository>();
 
 var app = builder.Build();
 
-app.MapGet("/products", ([FromServices] ProductRepository repository) =>
+app.MapGet("/products", (ProductRepository repository) =>
 {
     return repository.GetAllProducts();
 });
 
-app.MapGet("/product/{id:Guid}", ([FromServices] ProductRepository repository, Guid Id) =>
+app.MapGet("/product/{id:Guid}", (ProductRepository repository, Guid Id) =>
 {
     return repository.GetProductById(Id);
 });
 
-app.MapPost("/product/", ([FromServices] ProductRepository repository, Product product) =>
+app.MapPost("/product/", (ProductRepository repository, Product product) =>
 {
     repository.Create(product);
     return Results.Created($"/product/{product.Id}", product);
 });
 
-app.MapDelete("/product/{id:Guid}", ([FromServices] ProductRepository repository, Guid Id) => 
+app.MapDelete("/product/{id:Guid}", (ProductRepository repository, Guid Id) => 
 {
     repository.Delete(Id);
     return Results.Ok();
 });
 
-app.MapPut("/product/", ([FromServices] ProductRepository repository, Product product) =>
+app.MapPut("/product/", (ProductRepository repository, Product product) =>
 {
     repository.Update(product);
     return Results.Ok();
@@ -70,6 +68,7 @@ class ProductRepository
     public void Update(Product product)
     {
         var item = products.Single(x => x.Id == product.Id);
-        products.Add(item);
+        products.Remove(item);
+        products.Add(product);
     }
 }
